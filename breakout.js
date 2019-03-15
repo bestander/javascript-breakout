@@ -23,7 +23,7 @@ Breakout = {
 
     ball: {
       radius:  0.3,
-      speed:   15,
+      speed:   5,
       labels: {
         3: { text: 'ready...', fill: '#D82800', stroke: 'black', font: 'bold 28pt arial' },
         2: { text: 'set..',    fill: '#FC9838', stroke: 'black', font: 'bold 28pt arial' },
@@ -32,7 +32,7 @@ Breakout = {
     },
 
     paddle: {
-      width:  6,
+      width:  15,
       height: 1,
       speed:  20
     },
@@ -94,6 +94,31 @@ Breakout = {
     this.ball    = Object.construct(Breakout.Ball,   this, cfg.ball);
     this.score   = Object.construct(Breakout.Score,  this, cfg.score);
     Game.loadSounds({sounds: cfg.sounds});
+    var controller = new Leap.Controller({enableGestures: true});
+    controller.loop((frame) => {
+      for (var i in frame.handsMap) {
+        var hand = frame.handsMap[i];
+        var yaw = hand.yaw();
+        if(Math.abs(yaw) > 0.1) {
+          if (yaw > 0) {
+            this.paddle.stopMovingLeft();
+            this.paddle.moveRight();
+          } else {
+            this.paddle.stopMovingRight();
+            this.paddle.moveLeft();
+          }
+        } else {
+          this.paddle.stopMovingLeft();
+          this.paddle.stopMovingRight();
+        }
+        // start game
+        if (!this.moving) {
+          if (hand.pitch() > 0.7){
+            this.ball.launchNow();
+          }
+        }
+      }
+    });
   },
 
   onstartup: function() { // the event that fires the initial state transition occurs when Game.Runner constructs our StateMachine
@@ -106,7 +131,6 @@ Breakout = {
     Game.addEvent('next',  'click',  this.nextLevel.bind(this, false));
     Game.addEvent('sound', 'change', this.toggleSound.bind(this, false));
 
-    Game.addEvent('instructions',     'touchstart', this.play.bind(this));
     Game.addEvent(this.runner.canvas, 'touchmove',  this.ontouchmove.bind(this));
     Game.addEvent(document.body,      'touchmove',  function(event) { event.preventDefault(); }); // prevent ipad bouncing up and down when finger scrolled
   },
@@ -215,8 +239,6 @@ Breakout = {
   },
 
   refreshDOM: function() {
-    $('instructions').className = Game.ua.hasTouch ? 'touch' : 'keyboard';
-    $('instructions').showIf(this.is('menu'));
     $('prev').toggleClassName('disabled', !this.canPrevLevel());
     $('next').toggleClassName('disabled', !this.canNextLevel());
     $('level').update(this.level + 1);
