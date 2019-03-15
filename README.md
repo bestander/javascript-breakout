@@ -1,4 +1,4 @@
-Breakout
+Breakout - (Magic Leap fork)
 ========
 
 Another HTML5 experiment to implement BREAKOUT in a `<canvas>`
@@ -11,3 +11,7 @@ Another HTML5 experiment to implement BREAKOUT in a `<canvas>`
    * [Gameplay Balance](http://codeincomplete.com/posts/2011/6/13/gameplay_in_breakout/)
    * [Adding Sound](http://codeincomplete.com/posts/2011/6/16/adding_sound_to_breakout/)
    * [Touch Events](http://codeincomplete.com/posts/2011/6/24/adding_touch_to_breakout/)
+
+## This fork
+
+Adds support to control paddle with Magic Leap device using leap.js.
